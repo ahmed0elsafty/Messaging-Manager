@@ -1,0 +1,35 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.elsafty.messagingmanager.MainActivity">
+    <item
+        android:id="@+id/action_new_group"
+        android:orderInCategory="10"
+        android:title="@string/action_new_group"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sent"
+        android:orderInCategory="20"
+        android:title="@string/action_Sent"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_schedule"
+        android:orderInCategory="30"
+        android:title="@string/action_schedule"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_trash"
+        android:orderInCategory="40"
+        android:title="@string/action_trash"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="100"
+        android:title="@string/action_help"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="90"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+</menu>
