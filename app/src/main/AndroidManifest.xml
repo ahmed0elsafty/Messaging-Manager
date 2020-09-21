@@ -10,6 +10,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".newMessageActivity"
+            android:label="@string/new_message"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".TrashActivity"
+            android:label="@string/trash"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ScheduleActivity"
+            android:label="@string/schedule"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SentActivity"
+            android:label="@string/sent"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">

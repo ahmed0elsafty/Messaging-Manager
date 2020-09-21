@@ -10,4 +10,9 @@
     <string name="action_help"><![CDATA[Help & feedback]]></string>
     <string name="navigation_drawer_open">open navigation drawer</string>
     <string name="navigation_drawer_close">close navigation drawer</string>
+    <string name="user_name">User Name</string>
+    <string name="new_message">New Message</string>
+    <string name="trash">Trash</string>
+    <string name="schedule">Schedule Messages</string>
+    <string name="sent">Sent Messages</string>
 </resources>
