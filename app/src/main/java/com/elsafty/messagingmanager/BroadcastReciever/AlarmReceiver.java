@@ -20,10 +20,8 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         setContext(context);
-        // initialise database
         mSqlCommunication = new SqlCommunication(context);
 
-        // Receive SmsID from alarm extra
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             SmsID = bundle.getInt("SmsID");
@@ -39,7 +37,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         this.context = context;
     }
 
-    // Retrieve sms details from database using SmsID from alarm
     public void getSmsDetails() {
         MyMessage message= mSqlCommunication.getMessageById(SmsID);
         String number = message.getNumber();
@@ -51,16 +48,13 @@ public class AlarmReceiver extends BroadcastReceiver {
     // Send sms
     public void sendMySMS(String phoneNumber, String message, String name) {
         SmsManager sms = SmsManager.getDefault();
-        // If message is too long for single sms split into multiple messages
         List<String> messages = sms.divideMessage(message);
         for (String msg : messages) {
             Intent intent = new Intent(getContext(), NotifyUser.class);
 
-            // Pass recipient name and SmsID
             intent.putExtra("name", name);
             intent.putExtra("SmsID", SmsID);
 
-            // Broadcast receiver to listen for the sentstatus of the message.
             PendingIntent sentIntent = PendingIntent.getBroadcast(getContext(), SmsID, intent, 0);
             sms.sendTextMessage(phoneNumber, null, msg, sentIntent, null);
         }

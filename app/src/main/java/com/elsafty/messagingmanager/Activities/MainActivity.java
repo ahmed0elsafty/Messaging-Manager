@@ -24,7 +24,6 @@ import static android.Manifest.permission.READ_CONTACTS;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final int REQUEST_READ_CONTACTS = 1;
-    private static final int REQUEST_SMS = 2;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
     private NavigationView mNavigationView;
@@ -42,11 +41,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // If build version is marshmallow or higher request run time permission.
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    // Check permission status of Read_Contacts
                     int ReadContactsPermission = checkSelfPermission(READ_CONTACTS);
-                    // If permission is not granted display message informing user the application requires permission
                     if (ReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
                         requestContactPermission();
                         return;
@@ -68,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
 
 
     @Override
@@ -93,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(scheduleIntent);
                 return true;
             case R.id.action_trash:
-//                mDrawerLayout.closeDrawer(GravityCompat.START);
                 Intent trashIntent = new Intent(this, TrashActivity.class);
                 startActivity(trashIntent);
                 return true;
@@ -106,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return false;
     }
-    // Request permission to read users contacts
+
     private void requestContactPermission() {
         ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
     }
@@ -114,36 +108,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            /*case REQUEST_SMS:
-                // If result is permission granted attempt to schedule sms
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    validateInput();
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        // Display message informing user they must allow permission, if user selects ok ask again
-                        if (shouldShowRequestPermissionRationale(SEND_SMS)) {
-                            showMessageOKCancel("You must allow this permission to schedule an SMS",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                requestSmsPermission();
-                                            }
-                                        }
-                                    });
-                            return;
-                        }
-                    }
-                }
-                break;*/
 
             case REQUEST_READ_CONTACTS:
-                // If result is permission granted open select contact activity
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     selectContact();
                 } else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        // Display message informing user they must allow permission, if user selects ok ask again
                         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
                             showMessageOKCancel("You must allow this permission to select a contact",
                                     new DialogInterface.OnClickListener() {
@@ -165,11 +135,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-    // Open select contact activity
+
     private void selectContact() {
         Intent intent = new Intent(MainActivity.this, SelectContactActivity.class);
         startActivity(intent);
     }
+
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
                 .setMessage(message)

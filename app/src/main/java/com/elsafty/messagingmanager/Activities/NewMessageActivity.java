@@ -56,7 +56,6 @@ public class NewMessageActivity extends AppCompatActivity {
     private SqlCommunication mSqlCommunication;
 
     private static boolean AirplaneModeOn(Context context) {
-        // Return true if airplane more is on
         return Settings.Global.getInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     }
 
@@ -72,7 +71,7 @@ public class NewMessageActivity extends AppCompatActivity {
         txtTime = findViewById(R.id.txt_time);
         btnDate = findViewById(R.id.btn_date);
         btnTime = findViewById(R.id.btn_time);
-        mSqlCommunication  = new SqlCommunication(this);
+        mSqlCommunication = new SqlCommunication(this);
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,9 +97,7 @@ public class NewMessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    // Check permission status of SEND_SMS
                     int SMSPermission = checkSelfPermission(SEND_SMS);
-                    // If permission is not granted display message informing user the application requires permission
                     if (SMSPermission != PackageManager.PERMISSION_GRANTED) {
                         requestSmsPermission();
                         return;
@@ -114,13 +111,10 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private boolean validateSelectedDateTime() {
         Boolean validDateTime;
-        // Get current date and time
         Date currentDateTime = Calendar.getInstance().getTime();
-        // Get converted date and time
         Date selectedDateTime = convertSelectedDateTime();
 
-        if (selectedDateTime.compareTo(currentDateTime) < 0) // Compare dates, returns negative number if selected date is less than current date
-        {
+        if (selectedDateTime.compareTo(currentDateTime) < 0) {
             validDateTime = FALSE;
         } else {
             validDateTime = TRUE;
@@ -145,15 +139,13 @@ public class NewMessageActivity extends AppCompatActivity {
         Date convertedDateTime = null;
         String selectedDateTime = "";
 
-        // Add 1 to month as months are between 0-11
         int selectedMonth = (mDate.getMonth() + 1);
 
-        // Join integers and convert to String
         selectedDateTime += mDate.getYear() + "" + "" + String.format("%02d", selectedMonth) + "" +
                 String.format("%02d", mDate.getDay()) + "" + String.format("%02d", mTime.getHour()) + "" + String.format("%02d", mTime.getMinute());
 
         try {
-            //Convert String to date format
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
             convertedDateTime = sdf.parse(selectedDateTime);
         } catch (ParseException e) {
@@ -164,37 +156,27 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private void validateInput() {
         message = editTxtMessage.getText().toString();
-        if (name.isEmpty() & number.isEmpty()) // Ensure name is not empty
-        {
+        if (name.isEmpty() & number.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please Select a contact.", Toast.LENGTH_SHORT).show();
-        } else if (message.isEmpty()) // Ensure message is not empty.
-        {
+        } else if (message.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please enter a message.", Toast.LENGTH_SHORT).show();
-        } else if (mDate.getDay() == -1 || mDate.getMonth() == -1 || mDate.getYear() == -1)  // Ensure date has been selected
-        {
+        } else if (mDate.getDay() == -1 || mDate.getMonth() == -1 || mDate.getYear() == -1) {
             Toast.makeText(getApplicationContext(), "Please select a date", Toast.LENGTH_SHORT).show();
-        } else if (mTime.getMinute() == -1 || mTime.getHour() == -1) // Ensure a time has been selected.
-        {
+        } else if (mTime.getMinute() == -1 || mTime.getHour() == -1) {
             Toast.makeText(getApplicationContext(), "Please select a time", Toast.LENGTH_SHORT).show();
-        } else if (validateSelectedDateTime() == FALSE) // Compare dates, compare to returns negative number if selected date is less than current date
-        {
+        } else if (validateSelectedDateTime() == FALSE) {
             Toast.makeText(getApplicationContext(), "SMS must be scheduled for a future time", Toast.LENGTH_SHORT).show();
 
-        } else if (AirplaneModeOn(getApplicationContext()) == TRUE) // Check if airplane mode is on
-        {
-            // Options for dialog
+        } else if (AirplaneModeOn(getApplicationContext()) == TRUE) {
             String[] options = {"Continue to schedule", "Do not schedule", "Cancel"};
 
-            // Build dialog, set title and items as options
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("SMS will not send in airplane mode. Please select an option:");
             builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int selectedOption) {
-                    // listen for selected item, check selected item and perform appropriate action
                     if (selectedOption == 0) {
-                        if (validateSelectedDateTime() == FALSE)  // Ensure time has not changed into past
-                        {
+                        if (validateSelectedDateTime() == FALSE) {
                             Toast.makeText(getApplicationContext(), "Time has changed, SMS must be scheduled for a future time", Toast.LENGTH_SHORT).show();
                         } else {
                             addToSms(name, number, message);
@@ -203,7 +185,6 @@ public class NewMessageActivity extends AppCompatActivity {
                         Toast.makeText(NewMessageActivity.this, "SMS has not been scheduled", Toast.LENGTH_LONG).show();
                         resetInput();
                     } else if (selectedOption == 2) {
-                        //Do nothing as user has canceled
 
                     } else {
                         Toast.makeText(NewMessageActivity.this, "Sorry an error occurred.", Toast.LENGTH_LONG).show();
@@ -211,20 +192,20 @@ public class NewMessageActivity extends AppCompatActivity {
                 }
             });
             builder.show();
-        } else //Schedule SMS
-        {
+        } else {
             addToSms(name, number, message);
         }
     }
+
     public void addToSms(String contactName, String phoneNumber, String messageText) {
         String name = contactName;
         String number = phoneNumber;
         String message = messageText;
-        String messageDate = mDate.getDay() + "/" + mDate.getMonth() + "/" + mDate.getYear(); //Convert integers to string
-        String messageTime = String.format("%02d:%02d", mTime.getHour(), mTime.getMinute()); // Convert to String and format hours and minutes
+        String messageDate = mDate.getDay() + "/" + mDate.getMonth() + "/" + mDate.getYear();
+        String messageTime = String.format("%02d:%02d", mTime.getHour(), mTime.getMinute());
         String messageStatus = String.valueOf(SmsContract.STATUS_SCHEDULED);
 
-        // Start multi-thread to insert sms to database and start alarm manager
+
         ScheduleSmsAsyncTask task = new ScheduleSmsAsyncTask();
         task.execute(name, number, messageDate, messageTime, message, messageStatus);
     }
@@ -244,10 +225,9 @@ public class NewMessageActivity extends AppCompatActivity {
         protected String doInBackground(String... string) {
             String result = "SMS Successfully Scheduled";
             try {
-                // Construct a Sms object and pass it to the helper for database insertion
+
                 int SmsID = mSqlCommunication.insertMessage(new MyMessage(string[0], string[1], string[2], string[3], string[4], string[5]));
 
-                // Create calendar with selected date and time
                 Calendar c = Calendar.getInstance();
                 c.set(Calendar.YEAR, mDate.getYear());
                 c.set(Calendar.MONTH, mDate.getMonth());
@@ -256,14 +236,12 @@ public class NewMessageActivity extends AppCompatActivity {
                 c.set(Calendar.MINUTE, mTime.getMinute());
                 c.set(Calendar.SECOND, 0);
 
-                // Create alarm manager
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-                // Pass SmsID to AlarmReceiver class
+
                 Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
                 intent.putExtra("SmsID", SmsID);
 
-                //Set SmsID as unique id, Set time to calender, Start alarm
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), SmsID, intent, 0);
                 if (alarmManager != null) {
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
@@ -278,10 +256,8 @@ public class NewMessageActivity extends AppCompatActivity {
 
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            // Display result message
             Toast.makeText(NewMessageActivity.this, result, Toast.LENGTH_SHORT).show();
 
-            // Clear Sms Fields
             resetInput();
         }
     }

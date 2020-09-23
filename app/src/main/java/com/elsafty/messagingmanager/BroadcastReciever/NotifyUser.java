@@ -26,7 +26,6 @@ public class NotifyUser extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         mSqlCommunication = new SqlCommunication(context);
 
-        // Receive SmsID of the alarm to update the SMS status in database, Receive recepient name to display in notifications
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             recepientName = bundle.getString("name");
@@ -35,7 +34,6 @@ public class NotifyUser extends BroadcastReceiver {
 
         String messageSentStatus = "Message could not be sent.\nUnknown Error";
         setContext(context);
-        // Get result code, update database and set notifications message
         switch (getResultCode()) {
             case Activity.RESULT_OK:
                 messageSentStatus = "Message has been sent.";
@@ -61,11 +59,9 @@ public class NotifyUser extends BroadcastReceiver {
                 break;
         }
 
-        // Access shared preferences to determine if notification should be sent.
         SharedPreferences NotificationsPref = getContext().getSharedPreferences("switchStaus", 0);
         boolean notifcationsOn = NotificationsPref.getBoolean("notificationSwitch", true);
 
-        // If user would like to receive notifications send notification with appropriate message
         if (notifcationsOn == TRUE) {
             sendNotification(messageSentStatus);
         }
@@ -87,7 +83,6 @@ public class NotifyUser extends BroadcastReceiver {
         this.context = context;
     }
 
-    // Build notification using helper class
     public void sendNotification(String notificationMessage) {
         NotificationHelper notificationHelper = new NotificationHelper(getContext());
         NotificationCompat.Builder nb = notificationHelper.getChannelNotification(notificationMessage, recepientName);
