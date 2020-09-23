@@ -10,23 +10,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".newMessageActivity"
+            android:name=".Activities.SelectContactActivity"
+            android:parentActivityName=".Activities.MainActivity" />
+
+        <activity
+            android:name=".Activities.NewMessageActivity"
             android:label="@string/new_message"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".Activities.MainActivity" />
         <activity
-            android:name=".TrashActivity"
+            android:name=".Activities.TrashActivity"
             android:label="@string/trash"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".Activities.MainActivity" />
         <activity
-            android:name=".ScheduleActivity"
+            android:name=".Activities.ScheduleActivity"
             android:label="@string/schedule"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".Activities.MainActivity" />
         <activity
-            android:name=".SentActivity"
+            android:name=".Activities.SentActivity"
             android:label="@string/sent"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".Activities.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -35,6 +39,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".BroadcastReciever.NotifyUser"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
+        <receiver
+            android:name=".BroadcastReciever.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" />
     </application>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
 </manifest>

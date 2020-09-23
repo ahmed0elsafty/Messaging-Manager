@@ -15,4 +15,9 @@
     <string name="trash">Trash</string>
     <string name="schedule">Schedule Messages</string>
     <string name="sent">Sent Messages</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name_placeHolder">name</string>
+    <string name="contact_number_placeHolder">Contact Number</string>
+    <string name="no_date_selected">No Date Selected</string>
+    <string name="no_time_selected">No Time Selected</string>
 </resources>
