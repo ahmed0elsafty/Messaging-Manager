@@ -4,7 +4,7 @@
     android:id="@+id/nav_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#673AB7">
+    android:background="@color/colorPrimaryDark">
 
     <ImageView
         android:id="@+id/imageView2"

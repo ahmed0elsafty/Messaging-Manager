@@ -1,4 +1,8 @@
 <resources>
+    <plurals name="numberOfMembers">
+        <item quantity="one">%d member</item>
+        <item quantity="other">%d members</item>
+    </plurals>
     <string name="app_name">Messaging manager</string>
     <string name="action_settings">Settings</string>
     <string name="hello_first_fragment">Hello first fragment</string>
@@ -11,13 +15,20 @@
     <string name="navigation_drawer_open">open navigation drawer</string>
     <string name="navigation_drawer_close">close navigation drawer</string>
     <string name="user_name">User Name</string>
-    <string name="new_message">New Message</string>
-    <string name="trash">Trash</string>
-    <string name="schedule">Schedule Messages</string>
-    <string name="sent">Sent Messages</string>
+    <string name="newMessageActivity_label">New Message</string>
+    <string name="trashActivity_label">Trash</string>
+    <string name="scheduleActivity_label">Schedule Messages</string>
+    <string name="sentActivity_label">Sent Messages</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="name_placeHolder">name</string>
     <string name="contact_number_placeHolder">Contact Number</string>
     <string name="no_date_selected">No Date Selected</string>
     <string name="no_time_selected">No Time Selected</string>
+    <string name="newGroupActivity_label">New Group</string>
+    <string name="title_activity_select_contact">Select Contact</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
 </resources>

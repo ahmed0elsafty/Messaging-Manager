@@ -1,28 +1,23 @@
 package com.elsafty.messagingmanager.Pojos;
 
 public class MyMessage {
-    private String name;
-    private String number;
+    private String groupId;
+    private String txtMessage;
     private String date;
     private String time;
-    private String txtMessage;
     private String Status;
 
-    public MyMessage(String name, String number, String date, String time, String txtMessage, String status) {
-        this.name = name;
-        this.number = number;
+    public MyMessage(String groupId, String txtMessage, String date, String time, String status) {
+        this.groupId = groupId;
+        this.txtMessage = txtMessage;
         this.date = date;
         this.time = time;
-        this.txtMessage = txtMessage;
+
         Status = status;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getNumber() {
-        return number;
+    public String getGroupId() {
+        return groupId;
     }
 
     public String getDate() {
@@ -41,10 +36,9 @@ public class MyMessage {
         return Status;
     }
 
+
     @Override
     public String toString() {
-        return "MyMessage{" +
-                "txtMessage='" + txtMessage + '\'' +
-                '}';
+        return txtMessage;
     }
 }

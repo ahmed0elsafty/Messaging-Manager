@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 
+import com.elsafty.messagingmanager.Pojos.MyContact;
 import com.elsafty.messagingmanager.Pojos.MyMessage;
 import com.elsafty.messagingmanager.SQLite.SqlCommunication;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AlarmReceiver extends BroadcastReceiver {
+    private static final int REQUEST_CODE_NOTIFY_USER = 888;
     public Context context;
     private SqlCommunication mSqlCommunication;
     private int SmsID;
@@ -39,10 +42,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     public void getSmsDetails() {
         MyMessage message= mSqlCommunication.getMessageById(SmsID);
-        String number = message.getNumber();
-        String txtmessage = message.getTxtMessage();
-        String name = message.getName();
-        sendMySMS(number, txtmessage, name);
+        ArrayList<MyContact> contacts = mSqlCommunication.getAllContactsInTheSameGroup(Integer.parseInt(message.getGroupId()));
+        for (MyContact contact:contacts) {
+            sendMySMS(contact.getNumber(), message.getTxtMessage(), contact.getName());
+        }
     }
 
     // Send sms
@@ -55,7 +58,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             intent.putExtra("name", name);
             intent.putExtra("SmsID", SmsID);
 
-            PendingIntent sentIntent = PendingIntent.getBroadcast(getContext(), SmsID, intent, 0);
+            PendingIntent sentIntent = PendingIntent.getBroadcast(getContext(), REQUEST_CODE_NOTIFY_USER, intent, 0);
             sms.sendTextMessage(phoneNumber, null, msg, sentIntent, null);
         }
     }

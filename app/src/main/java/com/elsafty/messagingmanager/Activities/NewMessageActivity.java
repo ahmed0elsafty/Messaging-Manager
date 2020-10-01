@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.elsafty.messagingmanager.BroadcastReciever.AlarmReceiver;
 import com.elsafty.messagingmanager.Fragments.DateFragment;
 import com.elsafty.messagingmanager.Fragments.TimeFragment;
+import com.elsafty.messagingmanager.Pojos.MyContact;
 import com.elsafty.messagingmanager.Pojos.MyDate;
 import com.elsafty.messagingmanager.Pojos.MyMessage;
 import com.elsafty.messagingmanager.Pojos.MyTime;
@@ -29,6 +30,7 @@ import com.elsafty.messagingmanager.SQLite.SqlCommunication;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -42,6 +44,7 @@ import static java.lang.Boolean.TRUE;
 
 public class NewMessageActivity extends AppCompatActivity {
     private static final int REQUEST_SMS = 1;
+    private static final int REQUEST_CODE_ALARMRECIEVER = 999;
     private EditText editTxtMessage;
     private TextView txtDate;
     private TextView txtTime;
@@ -53,6 +56,8 @@ public class NewMessageActivity extends AppCompatActivity {
     private String message;
     private MyDate mDate;
     private MyTime mTime;
+    ArrayList<MyContact> results;
+    private int groupId;
     private SqlCommunication mSqlCommunication;
 
     private static boolean AirplaneModeOn(Context context) {
@@ -65,6 +70,7 @@ public class NewMessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_message);
         mDate = new MyDate();
         mTime = new MyTime();
+        results = new ArrayList<>();
         editTxtMessage = findViewById(R.id.edit_txxMessage);
         btnSend = findViewById(R.id.btn_send);
         txtDate = findViewById(R.id.txt_date);
@@ -89,9 +95,11 @@ public class NewMessageActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        if (intent != null && intent.hasExtra(SelectContactActivity.NAME_KEY) && intent.hasExtra(SelectContactActivity.NUMBER_KEY)) {
-            name = intent.getStringExtra(SelectContactActivity.NAME_KEY);
-            number = intent.getStringExtra(SelectContactActivity.NUMBER_KEY);
+        if (intent != null && intent.getAction().equals(MainActivity.SENDMESSAGE_TO_GROUP_ACTION)) {
+            results = intent.getParcelableArrayListExtra("group_member");
+            groupId = intent.getIntExtra("group-id",-1);
+
+            Toast.makeText(this, String.valueOf(groupId), Toast.LENGTH_SHORT).show();
         }
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +110,7 @@ public class NewMessageActivity extends AppCompatActivity {
                         requestSmsPermission();
                         return;
                     }
+
                     validateInput();
                 }
             }
@@ -110,7 +119,7 @@ public class NewMessageActivity extends AppCompatActivity {
     }
 
     private boolean validateSelectedDateTime() {
-        Boolean validDateTime;
+        boolean validDateTime;
         Date currentDateTime = Calendar.getInstance().getTime();
         Date selectedDateTime = convertSelectedDateTime();
 
@@ -156,13 +165,12 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private void validateInput() {
         message = editTxtMessage.getText().toString();
-        if (name.isEmpty() & number.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Please Select a contact.", Toast.LENGTH_SHORT).show();
-        } else if (message.isEmpty()) {
+        if (message.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please enter a message.", Toast.LENGTH_SHORT).show();
         } else if (mDate.getDay() == -1 || mDate.getMonth() == -1 || mDate.getYear() == -1) {
             Toast.makeText(getApplicationContext(), "Please select a date", Toast.LENGTH_SHORT).show();
         } else if (mTime.getMinute() == -1 || mTime.getHour() == -1) {
+
             Toast.makeText(getApplicationContext(), "Please select a time", Toast.LENGTH_SHORT).show();
         } else if (validateSelectedDateTime() == FALSE) {
             Toast.makeText(getApplicationContext(), "SMS must be scheduled for a future time", Toast.LENGTH_SHORT).show();
@@ -179,7 +187,7 @@ public class NewMessageActivity extends AppCompatActivity {
                         if (validateSelectedDateTime() == FALSE) {
                             Toast.makeText(getApplicationContext(), "Time has changed, SMS must be scheduled for a future time", Toast.LENGTH_SHORT).show();
                         } else {
-                            addToSms(name, number, message);
+                            createMessage(groupId,  message);
                         }
                     } else if (selectedOption == 1) {
                         Toast.makeText(NewMessageActivity.this, "SMS has not been scheduled", Toast.LENGTH_LONG).show();
@@ -193,13 +201,12 @@ public class NewMessageActivity extends AppCompatActivity {
             });
             builder.show();
         } else {
-            addToSms(name, number, message);
+            createMessage(groupId,  message);
         }
     }
 
-    public void addToSms(String contactName, String phoneNumber, String messageText) {
-        String name = contactName;
-        String number = phoneNumber;
+    public void createMessage(int groupId, String messageText) {
+        String gid = String.valueOf(groupId);
         String message = messageText;
         String messageDate = mDate.getDay() + "/" + mDate.getMonth() + "/" + mDate.getYear();
         String messageTime = String.format("%02d:%02d", mTime.getHour(), mTime.getMinute());
@@ -207,7 +214,7 @@ public class NewMessageActivity extends AppCompatActivity {
 
 
         ScheduleSmsAsyncTask task = new ScheduleSmsAsyncTask();
-        task.execute(name, number, messageDate, messageTime, message, messageStatus);
+        task.execute(gid, message, messageDate, messageTime, messageStatus);
     }
 
     private void resetInput() {
@@ -226,7 +233,7 @@ public class NewMessageActivity extends AppCompatActivity {
             String result = "SMS Successfully Scheduled";
             try {
 
-                int SmsID = mSqlCommunication.insertMessage(new MyMessage(string[0], string[1], string[2], string[3], string[4], string[5]));
+                int SmsID = mSqlCommunication.insertMessage(new MyMessage(string[0],string[1],string[2],string[3],string[4]),0);
 
                 Calendar c = Calendar.getInstance();
                 c.set(Calendar.YEAR, mDate.getYear());
@@ -242,7 +249,7 @@ public class NewMessageActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
                 intent.putExtra("SmsID", SmsID);
 
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), SmsID, intent, 0);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), REQUEST_CODE_ALARMRECIEVER, intent, 0);
                 if (alarmManager != null) {
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
                 }
@@ -257,7 +264,6 @@ public class NewMessageActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             Toast.makeText(NewMessageActivity.this, result, Toast.LENGTH_SHORT).show();
-
             resetInput();
         }
     }

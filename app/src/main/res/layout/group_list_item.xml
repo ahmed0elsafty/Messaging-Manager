@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
     app:cardBackgroundColor="@color/colorDarkBlue2"
@@ -98,13 +98,13 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/number"
+                        android:id="@+id/number_of_members"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:maxLines="1"
                         android:singleLine="true"
-                        android:text="01009064947"
+                        android:text="5 members"
                         android:textColor="@color/colorWhite"
                         android:textSize="12sp" />
 

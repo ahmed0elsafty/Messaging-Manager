@@ -8,28 +8,29 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.elsafty.messagingmanager.Pojos.MyContact;
+import com.elsafty.messagingmanager.Pojos.MyGroup;
 import com.elsafty.messagingmanager.R;
+import com.elsafty.messagingmanager.SQLite.SqlCommunication;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
+public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
     private Context ctx;
-    private List<MyContact> items;
+    private List<MyGroup> items;
     private OnClickListener onClickListener = null;
-
+    private SqlCommunication sqlCommunication;
     private SparseBooleanArray selected_items;
     private int current_selected_idx = -1;
 
-    public ContactAdapter(Context mContext, List<MyContact> items) {
+    public GroupAdapter(Context mContext, List<MyGroup> items) {
         this.ctx = mContext;
         this.items = items;
         selected_items = new SparseBooleanArray();
+        sqlCommunication = new SqlCommunication(mContext);
     }
 
     public void setOnClickListener(OnClickListener onClickListener) {
@@ -38,18 +39,18 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.contact_list_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.group_list_item, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final MyContact contact = items.get(position);
+        final MyGroup group = items.get(position);
 
         // displaying text view data
-        holder.name.setText(contact.getName());
-        holder.number.setText(contact.getNumber());
-        holder.image_letter.setText(contact.getName().substring(0, 1));
+        holder.name.setText(group.getName());
+        holder.number.setText(ctx.getResources().getQuantityString(R.plurals.numberOfMembers,group.getMembers(),group.getMembers()));
+        holder.image_letter.setText(group.getName().substring(0, 1));
 
         holder.lyt_parent.setActivated(selected_items.get(position, false));
 
@@ -57,7 +58,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 if (onClickListener == null) return;
-                onClickListener.onItemClick(v, contact, position);
+                onClickListener.onItemClick(v, group, position);
             }
         });
 
@@ -65,24 +66,24 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             @Override
             public boolean onLongClick(View v) {
                 if (onClickListener == null) return false;
-                onClickListener.onItemLongClick(v, contact, position);
+                onClickListener.onItemLongClick(v, group, position);
                 return true;
             }
         });
 
         toggleCheckedIcon(holder, position);
-        displayImage(holder, contact);
+        displayImage(holder, group);
 
     }
 
-    private void displayImage(ViewHolder holder, MyContact contact) {
-        if (contact.getImage() != null) {
-            holder.image.setImageResource(contact.getImage());
+    private void displayImage(ViewHolder holder, MyGroup group) {
+        if (group.getPhoto() != null) {
+            holder.image.setImageResource(Integer.parseInt((group.getPhoto())));
             holder.image.setColorFilter(null);
             holder.image_letter.setVisibility(View.GONE);
         } else {
             holder.image.setImageResource(R.drawable.shape_circle);
-            holder.image.setColorFilter(contact.getColor());
+            holder.image.setColorFilter(group.getColor());
             holder.image_letter.setVisibility(View.VISIBLE);
         }
     }
@@ -99,16 +100,25 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         }
     }
 
-    public MyContact getItem(int position) {
-        return items.get(position);
-    }
-
     @Override
     public int getItemCount() {
         return items.size();
     }
 
-    public void toggleSelection(int pos) {
+    /*public MyGroup getItem(int position) {
+        return items.get(position);
+    }*/
+
+    /*public void removeData(int position) {
+        items.remove(position);
+        resetCurrentIndex();
+    }
+*/
+    private void resetCurrentIndex() {
+        current_selected_idx = -1;
+    }
+
+   /* public void toggleSelection(int pos) {
         current_selected_idx = pos;
         if (selected_items.get(pos, false)) {
             selected_items.delete(pos);
@@ -117,8 +127,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         }
         notifyItemChanged(pos);
     }
-
-    public void clearSelections() {
+*/
+    /*public void clearSelections() {
         selected_items.clear();
         notifyDataSetChanged();
     }
@@ -133,21 +143,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             items.add(selected_items.keyAt(i));
         }
         return items;
-    }
-
-    public void removeData(int position) {
-        items.remove(position);
-        resetCurrentIndex();
-    }
-
-    private void resetCurrentIndex() {
-        current_selected_idx = -1;
-    }
+    }*/
 
     public interface OnClickListener {
-        void onItemClick(View view, MyContact obj, int pos);
-
-        void onItemLongClick(View view, MyContact obj, int pos);
+        void onItemClick(View view, MyGroup obj, int pos);
+        void onItemLongClick(View view, MyGroup obj, int pos);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -160,7 +160,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         public ViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
-            number = view.findViewById(R.id.number);
+            number = view.findViewById(R.id.number_of_members);
             image_letter = view.findViewById(R.id.image_letter);
             image = view.findViewById(R.id.image);
             lyt_checked = view.findViewById(R.id.lyt_checked);

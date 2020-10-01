@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 
@@ -12,8 +11,6 @@ import com.elsafty.messagingmanager.SQLite.SqlCommunication;
 import com.elsafty.messagingmanager.Utilities.NotificationHelper;
 
 import androidx.core.app.NotificationCompat;
-
-import static java.lang.Boolean.TRUE;
 
 public class NotifyUser extends BroadcastReceiver {
 
@@ -59,20 +56,17 @@ public class NotifyUser extends BroadcastReceiver {
                 break;
         }
 
-        SharedPreferences NotificationsPref = getContext().getSharedPreferences("switchStaus", 0);
-        boolean notifcationsOn = NotificationsPref.getBoolean("notificationSwitch", true);
 
-        if (notifcationsOn == TRUE) {
             sendNotification(messageSentStatus);
-        }
+
     }
 
     public void updateSmsToSent() {
-        mSqlCommunication.updateMessageToSent(SmsID);
+       // mSqlCommunication.updateMessageToSent(SmsID);
     }
 
     public void updateSmsToFailed() {
-        mSqlCommunication.updateMessageToFailed(SmsID);
+        //mSqlCommunication.updateMessageToFailed(SmsID);
     }
 
     public Context getContext() {
