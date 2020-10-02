@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -11,10 +10,10 @@
 
     app:cardElevation="0dp">
 
-    <com.balysv.materialripple.MaterialRippleLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.balysv.materialripple.MaterialRippleLayout
         style="@style/RippleStyleBlack"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp">
 
         <LinearLayout
             android:id="@+id/lyt_parent"
@@ -23,6 +22,7 @@
             android:background="@drawable/bg_multi_selection"
             android:clickable="true"
             android:orientation="horizontal"
+            android:padding="8dp"
             android:paddingTop="@dimen/spacing_large"
             android:paddingBottom="@dimen/spacing_large">
 
@@ -30,25 +30,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
-                <RelativeLayout
-                    android:id="@+id/lyt_checked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/shape_circle"
-                        app:tint="@color/red_500" />
-
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_centerInParent="true"
-                        app:srcCompat="@drawable/ic_check" />
-
-                </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/lyt_image"
@@ -88,7 +69,9 @@
                     <TextView
                         android:id="@+id/name"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="bottom"
                         android:maxLines="1"
                         android:singleLine="true"
                         android:text="Ahmed Elsafty"
@@ -100,11 +83,12 @@
                     <TextView
                         android:id="@+id/number_of_members"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
                         android:layout_marginTop="2dp"
+                        android:layout_weight="1"
                         android:maxLines="1"
                         android:singleLine="true"
-                        android:text="5 members"
+                        android:text="01009064947"
                         android:textColor="@color/colorWhite"
                         android:textSize="12sp" />
 
@@ -113,9 +97,6 @@
 
             </RelativeLayout>
 
-            <View
-                android:layout_width="18dp"
-                android:layout_height="0dp" />
 
             <View
                 android:layout_width="@dimen/spacing_large"

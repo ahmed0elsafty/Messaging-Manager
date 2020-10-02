@@ -5,7 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.widget.DatePicker;
 
-import com.elsafty.messagingmanager.Activities.NewMessageActivity;
+import com.elsafty.messagingmanager.Activities.ScheduleMessageActivity;
 
 import java.util.Calendar;
 
@@ -26,7 +26,7 @@ public class DateFragment extends DialogFragment implements DatePickerDialog.OnD
 
     @Override
     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-        NewMessageActivity activity = (NewMessageActivity) getActivity();
+        ScheduleMessageActivity activity = (ScheduleMessageActivity) getActivity();
         activity.getDatePickerResult(year, month, day);
     }
 }

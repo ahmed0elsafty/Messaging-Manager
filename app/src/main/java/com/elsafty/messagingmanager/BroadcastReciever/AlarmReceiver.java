@@ -62,4 +62,6 @@ public class AlarmReceiver extends BroadcastReceiver {
             sms.sendTextMessage(phoneNumber, null, msg, sentIntent, null);
         }
     }
+
+
 }

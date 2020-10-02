@@ -38,7 +38,7 @@ public class SelectContactActivity extends AppCompatActivity {
     private FloatingActionButton fab_Load;
     private ArrayList<MyContact> contacts;
     private boolean fromNewGroup = false;
-    private boolean fromSelectContact = false;
+    private boolean fromMainActivity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +54,8 @@ public class SelectContactActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.getAction().equals(NewGroupActivity.NEWGROUPACTIVITY_ACTION)){
             fromNewGroup = true;
+        }else if(intent.getAction().equals(MainActivity.MAINACTIVITY_ACTION)){
+            fromMainActivity =true;
         }
         initComponent();
         Toast.makeText(this, "Long press for multi selection", Toast.LENGTH_SHORT).show();
@@ -64,7 +66,7 @@ public class SelectContactActivity extends AppCompatActivity {
             writeInSharedPref(true);
         }
         contacts = new ArrayList<>();
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.select_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,7 +107,7 @@ public class SelectContactActivity extends AppCompatActivity {
     }
 
     private void initComponent() {
-        fab_Load = findViewById(R.id.fab);
+        fab_Load = findViewById(R.id.select_fab);
         recyclerView =  findViewById(R.id.contact_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -200,7 +202,7 @@ public class SelectContactActivity extends AppCompatActivity {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             Tools.setSystemBarColor(SelectContactActivity.this, R.color.colorDarkBlue2);
-            mode.getMenuInflater().inflate(R.menu.menu_delete, menu);
+           // mode.getMenuInflater().inflate(R.menu.menu_delete, menu);
             return true;
         }
 
@@ -211,13 +213,7 @@ public class SelectContactActivity extends AppCompatActivity {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            int id = item.getItemId();
-            if (id == R.id.action_delete) {
-                deleteContacts();
-                mode.finish();
-                return true;
-            }
-            return false;
+            return true;
         }
 
         @Override

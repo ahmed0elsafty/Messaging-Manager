@@ -5,7 +5,7 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.widget.TimePicker;
 
-import com.elsafty.messagingmanager.Activities.NewMessageActivity;
+import com.elsafty.messagingmanager.Activities.ScheduleMessageActivity;
 
 import java.util.Calendar;
 
@@ -25,7 +25,7 @@ public class TimeFragment extends DialogFragment implements TimePickerDialog.OnT
 
     @Override
     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-        NewMessageActivity activity = (NewMessageActivity) getActivity();
+        ScheduleMessageActivity activity = (ScheduleMessageActivity) getActivity();
         activity.getTimePickerResult(hour,minute);
     }
 }

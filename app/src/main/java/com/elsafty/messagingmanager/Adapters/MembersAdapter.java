@@ -17,13 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHolder> {
 
-    private Context ctx;
+    private Context mContext;
     private List<MyContact> items;
+    private MyOnClickListener myOnClickListener;
 
-
-    public MembersAdapter(Context mContext, List<MyContact> items) {
-        this.ctx = mContext;
+    public MembersAdapter(Context mContext, List<MyContact> items,MyOnClickListener myOnClickListener) {
+        this.mContext = mContext;
         this.items = items;
+        this.myOnClickListener = myOnClickListener;
+    }
+    public interface MyOnClickListener{
+        void onClick(String name,String number,int id);
     }
 
     @Override
@@ -66,12 +70,8 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHold
         return items.size();
     }
 
-    public void removeData(int position) {
-        items.remove(position);
-        notifyDataSetChanged();
-    }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView name, number, image_letter;
         public CircularImageView image;
@@ -84,9 +84,14 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHold
             number = view.findViewById(R.id.number);
             image_letter = view.findViewById(R.id.image_letter);
             image = view.findViewById(R.id.image);
-            lyt_checked = view.findViewById(R.id.lyt_checked);
             lyt_image = view.findViewById(R.id.lyt_image);
             lyt_parent = view.findViewById(R.id.lyt_parent);
+            lyt_parent.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            myOnClickListener.onClick(getItem(getAdapterPosition()).getName(),getItem(getAdapterPosition()).getNumber(),getAdapterPosition()+1);
         }
     }
 }

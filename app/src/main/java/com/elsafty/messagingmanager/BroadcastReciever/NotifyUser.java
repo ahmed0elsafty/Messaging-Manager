@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 
+import com.elsafty.messagingmanager.SQLite.SmsContract;
 import com.elsafty.messagingmanager.SQLite.SqlCommunication;
 import com.elsafty.messagingmanager.Utilities.NotificationHelper;
 
@@ -55,18 +56,18 @@ public class NotifyUser extends BroadcastReceiver {
             default:
                 break;
         }
-
-
-            sendNotification(messageSentStatus);
+            if (!recepientName.isEmpty()){
+                sendNotification(messageSentStatus);
+            }
 
     }
 
     public void updateSmsToSent() {
-       // mSqlCommunication.updateMessageToSent(SmsID);
+        mSqlCommunication.updateMessage(SmsID, SmsContract.STATUS_SENT);
     }
 
     public void updateSmsToFailed() {
-        //mSqlCommunication.updateMessageToFailed(SmsID);
+        mSqlCommunication.updateMessage(SmsID,SmsContract.STATUS_FAILED);
     }
 
     public Context getContext() {

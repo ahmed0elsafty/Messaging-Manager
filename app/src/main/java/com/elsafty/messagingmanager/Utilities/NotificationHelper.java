@@ -12,7 +12,7 @@ import android.graphics.Color;
 import android.os.Build;
 
 import com.elsafty.messagingmanager.Activities.MainActivity;
-import com.elsafty.messagingmanager.Activities.NewMessageActivity;
+import com.elsafty.messagingmanager.Activities.ScheduleMessageActivity;
 import com.elsafty.messagingmanager.R;
 
 import androidx.core.app.NotificationCompat;
@@ -55,7 +55,7 @@ public class NotificationHelper extends ContextWrapper {
                 new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         PendingIntent smsScheduleIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, NewMessageActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                new Intent(this, ScheduleMessageActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
 

@@ -6,64 +6,47 @@
     android:layout_height="match_parent"
     tools:context=".Activities.NewMessageActivity">
 
-    <Button
-        android:id="@+id/btn_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="76dp"
-        android:text="Date"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_txxMessage" />
-
-    <Button
-        android:id="@+id/btn_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
-        android:text="Time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_date" />
-
     <EditText
-        android:id="@+id/edit_txxMessage"
+        android:id="@+id/edit_newMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="36dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
-        android:hint="Message"
+        android:hint="Enter your message"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toStartOf="@+id/btn_send"
+        app:layout_constraintEnd_toStartOf="@+id/btn_send_newmessage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/btn_send"
+        android:id="@+id/btn_send_newmessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_newMessage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edit_txxMessage"
+        app:layout_constraintTop_toTopOf="@+id/edit_newMessage"
         app:srcCompat="@drawable/ic_send_" />
 
     <TextView
-        android:id="@+id/txt_date"
+        android:id="@+id/txtMessageName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@+id/btn_date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.269"
-        app:layout_constraintStart_toEndOf="@+id/btn_date" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="92dp"
+        android:text="Name:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_newMessage" />
 
     <TextView
-        android:id="@+id/txt_time"
+        android:id="@+id/txtMessageNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@+id/btn_time"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.269"
-        app:layout_constraintStart_toEndOf="@+id/btn_time" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="56dp"
+        android:text="Number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtMessageName" />
 </androidx.constraintlayout.widget.ConstraintLayout>

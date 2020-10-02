@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -31,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener , GroupAdapter.OnClickListener {
     public static final String MAINACTIVITY_ACTION = "main-activity";
     public static final String SENDMESSAGE_TO_GROUP_ACTION = "send_group";
     private static final int REQUEST_READ_CONTACTS = 1;
@@ -40,27 +42,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView mNavigationView;
     private SqlCommunication sqlCommunication;
     private RecyclerView recyclerView;
-    private FloatingActionButton fab_Load;
+    private FloatingActionButton newMessageFab,newScheduleFab;
     private GroupAdapter mAdapter;
     private List<MyGroup> items;
-    //private MainActivity.ActionModeCallback actionModeCallback;
-    //private ActionMode actionMode;
-    ;
+    private boolean isFABOpen;
+    private int groupId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.main_toolbar);
+        toolbar.setTitle("Groups");
         setSupportActionBar(toolbar);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mNavigationView = findViewById(R.id.nav_view);
         sqlCommunication = new SqlCommunication(this);
-        items = new ArrayList<>();
-        initComponent();
+        newScheduleFab = findViewById(R.id.newschedule_fab);
+        newMessageFab = findViewById(R.id.newMsseage_fab);
+        recyclerView = findViewById(R.id.group_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        items = sqlCommunication.getAllGroups();
+        mAdapter = new GroupAdapter(this, items,this);
+        recyclerView.setAdapter(mAdapter);
 
-
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.select_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,9 +76,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (ReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
                         requestContactPermission();
                     } else {
-                        //selectContact();
+                        if(!isFABOpen){
+                            showFABMenu();
+                        }else{
+                            closeFABMenu();
+                        }
                     }
                 }
+            }
+        });
+        newScheduleFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "schedule", Toast.LENGTH_SHORT).show();
+                selectContact();
+            }
+        });
+        newMessageFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectContact();
             }
         });
         mToggle = new ActionBarDrawerToggle(this,
@@ -88,6 +112,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId()==R.id.newMessage){
+
+            ArrayList<MyContact> contactInGroup = sqlCommunication.getAllContactsInTheSameGroup(groupId);
+            Intent intent = new Intent(MainActivity.this, NewMessageActivity.class);
+            intent.setAction(SENDMESSAGE_TO_GROUP_ACTION);
+            intent.putParcelableArrayListExtra("group_member",contactInGroup);
+            intent.putExtra("group-id",groupId);
+            startActivity(intent);
+        }else {
+            ArrayList<MyContact> contactInGroup = sqlCommunication.getAllContactsInTheSameGroup(groupId);
+            Intent intent = new Intent(MainActivity.this, ScheduleMessageActivity.class);
+            intent.setAction(SENDMESSAGE_TO_GROUP_ACTION);
+            intent.putParcelableArrayListExtra("group_member",contactInGroup);
+            intent.putExtra("group-id",groupId);
+            startActivity(intent);
+        }
+
+        return super.onContextItemSelected(item);
+
+    }
+
+    private void showFABMenu(){
+        isFABOpen=true;
+        newMessageFab.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
+        newScheduleFab.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+
+    }
+
+    private void closeFABMenu(){
+        isFABOpen=false;
+        newMessageFab.animate().translationY(0);
+        newScheduleFab.animate().translationY(0);
     }
 
 
@@ -168,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void selectContact() {
-        Intent intent = new Intent(this, SelectContactActivity.class);
+        Intent intent = new Intent(this, SelelctForMessageActivity.class);
         intent.setAction(MAINACTIVITY_ACTION);
         startActivity(intent);
     }
@@ -183,72 +251,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .show();
     }
 
-    private void initComponent() {
-        fab_Load = findViewById(R.id.fab);
-        recyclerView = findViewById(R.id.group_recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-
-        //set data and list adapter
-        items = sqlCommunication.getAllGroups();
-        mAdapter = new GroupAdapter(this, items);
-        recyclerView.setAdapter(mAdapter);
-        mAdapter.setOnClickListener(new GroupAdapter.OnClickListener() {
-            @Override
-            public void onItemClick(View view, MyGroup obj, int pos) {
-                /*if (mAdapter.getSelectedItemCount() > 0) {
-                    enableActionMode(pos);
-                } else {
-                    // read the group which removes bold from the row
-                    MyGroup group = mAdapter.getItem(pos);
-                    Toast.makeText(getApplicationContext(), "Read: " + group.getName(), Toast.LENGTH_SHORT).show();
-                }*/
-                int groupId = pos+1;
-                ArrayList<MyContact> contactInGroup = sqlCommunication.getAllContactsInTheSameGroup(groupId);
-
-                Intent intent = new Intent(MainActivity.this,NewMessageActivity.class);
-                intent.setAction(SENDMESSAGE_TO_GROUP_ACTION);
-                intent.putParcelableArrayListExtra("group_member",contactInGroup);
-                intent.putExtra("group-id",groupId);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onItemLongClick(View view, MyGroup obj, int pos) {
-                //enableActionMode(pos);
-            }
-        });
-
-        fab_Load.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-
-        //actionModeCallback = new MainActivity.ActionModeCallback();
-
+    @Override
+    public void onItemClick(View view, MyGroup obj, int pos) {
+        groupId = pos+1;
     }
 
-    /*private void enableActionMode(int position) {
-        if (actionMode == null) {
-            actionMode = startSupportActionMode(actionModeCallback);
-        }
-        toggleSelection(position);
-    }
 
-    private void toggleSelection(int position) {
-        mAdapter.toggleSelection(position);
-        int count = mAdapter.getSelectedItemCount();
 
-        if (count == 0) {
-            actionMode.finish();
-        } else {
-            actionMode.setTitle(String.valueOf(count));
-            actionMode.invalidate();
-        }
-    }*/
+
+
 
     /*private void deleteGroups() {
         List<Integer> selectedItemPositions = mAdapter.getSelectedItems();
@@ -257,38 +268,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             sqlCommunication.deleteGroup(selectedItemPositions.get(i));
         }
         mAdapter.notifyDataSetChanged();
-    }*/
-
-   /* private class ActionModeCallback implements ActionMode.Callback {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            Tools.setSystemBarColor(MainActivity.this, R.color.colorDarkBlue2);
-            mode.getMenuInflater().inflate(R.menu.menu_delete, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            int id = item.getItemId();
-            if (id == R.id.action_delete) {
-                deleteGroups();
-                mode.finish();
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mAdapter.clearSelections();
-            actionMode = null;
-            Tools.setSystemBarColor(MainActivity.this, R.color.colorPrimary);
-        }
     }*/
 }
 

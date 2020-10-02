@@ -114,31 +114,24 @@ public class SqlCommunication {
         return insertedSmsID;
     }
 
-    public ArrayList<RealMessage> getMessagesList(int status) {
+    /*public ArrayList<MyMessage> getMessagesList(int status) {
         SQLiteDatabase db = mDpHelper.getReadableDatabase();
 
-        String queryStatement = "SELECT * " + SmsContract.TABLE_NAME + " ," + ContactContract.TABLE_NAME + "." + ContactContract.COLUMN_NAME +
-                " ," + ContactContract.TABLE_NAME + "." + ContactContract.COLUMN_NUMBER + " FROM " + ContactMessageContract.TABLE_NAME +
-                " INNER JOIN " + SmsContract.TABLE_NAME + " ON " + SmsContract.COLUMN_ID + " = " + ContactMessageContract.COLUMN_Message_ID +
-                " AND " + SmsContract.TABLE_NAME + "." + SmsContract.COLUMN_STATUS + " = " + status +
-                " INNER JOIN " + ContactContract.TABLE_NAME + " ON " + ContactContract.COLUMN_ID + " = " + ContactMessageContract.COLUMN_CONTACT_ID;
-        Cursor result = db.rawQuery(queryStatement, null);
-        ArrayList<RealMessage> messages = new ArrayList<RealMessage>();
+        Cursor result = db.query(SmsContract.TABLE_NAME, null,null,null,null,null,null);
+        ArrayList<MyMessage> messages = new ArrayList<MyMessage>();
 
 
         while (result.moveToNext()) {
 
-            messages.add(new RealMessage(result.getString(result.getColumnIndex(SmsContract.COLUMN_GROUP_ID)),
+            messages.add(new MyMessage(result.getString(result.getColumnIndex(SmsContract.COLUMN_GROUP_ID)),
                     result.getString(result.getColumnIndex(SmsContract.COLUMN_SMS_TEXT)),
                     result.getString(result.getColumnIndex(SmsContract.COLUMN_DATE)),
                     result.getString(result.getColumnIndex(SmsContract.COLUMN_TIME)),
-                    result.getString(result.getColumnIndex(SmsContract.COLUMN_STATUS)),
-                    result.getString(result.getColumnIndex(ContactContract.COLUMN_NAME)),
-                    result.getString(result.getColumnIndex(ContactContract.COLUMN_NUMBER))));
+                    result.getString(result.getColumnIndex(SmsContract.COLUMN_STATUS))));
         }
         db.close();
         return messages;
-    }
+    }*/
 
     public MyMessage getMessageById(int searchID) {
         SQLiteDatabase db = mDpHelper.getReadableDatabase();
@@ -160,23 +153,56 @@ public class SqlCommunication {
     }
 
 
-    public int getMessageID(RealMessage message) {
+    public int getMessageID(MyMessage message) {
         SQLiteDatabase db = mDpHelper.getReadableDatabase();
 
-        String selections = SmsContract.COLUMN_GROUP_ID + " = '" + message.getGroupId() +
-                "' AND " + SmsContract.COLUMN_SMS_TEXT + " = '" + message.getTxtMessage() +
-                "' AND " + SmsContract.COLUMN_DATE + " = '" + message.getDate() +
-                "' AND " + SmsContract.COLUMN_TIME + " = '" + message.getTime() +
-                "' AND " + SmsContract.COLUMN_STATUS + " = '" + message.getStatus() +
-                "' AND " + ContactContract.COLUMN_NAME + " = '" + message.getName() +
-                "' AND " + ContactContract.COLUMN_NUMBER + " = '" + message.getNumber() + "'";
+        String selections = SmsContract.COLUMN_GROUP_ID + " IS " + message.getGroupId() +
+                " AND " + SmsContract.COLUMN_SMS_TEXT + " IS '" + message.getTxtMessage() +
+                "' AND " + SmsContract.COLUMN_DATE + " IS '" + message.getDate() +
+                "' AND " + SmsContract.COLUMN_TIME + " IS '" + message.getTime() +
+                "' AND " + SmsContract.COLUMN_STATUS + " IS " + message.getStatus() ;
         String query = "SELECT " + SmsContract.COLUMN_ID + " FROM " + SmsContract.TABLE_NAME +
                 " WHERE " + selections;
 
         Cursor result = db.rawQuery(query, null);
-
+        result.moveToFirst();
         int id = result.getInt(result.getColumnIndex(SmsContract.COLUMN_ID));
         return id;
+    }
+    public ArrayList<RealMessage> getMessagesList(int messageStatus){
+        SQLiteDatabase db = mDpHelper.getReadableDatabase();
+        String queryStatement = "SELECT "+SmsContract.TABLE_NAME+".* ,"+ContactContract.COLUMN_NAME +
+                " FROM "+ContactMessageContract.TABLE_NAME+" INNER JOIN "+SmsContract.TABLE_NAME+
+                " ON " + SmsContract.COLUMN_ID + " = "+ContactMessageContract.COLUMN_Message_ID+
+                " AND "+SmsContract.COLUMN_STATUS + " = "+messageStatus+" AND "+ ContactMessageContract.COLUMN_CONTACT_ID +
+                " IS NOT NULL"+" INNER JOIN "+ContactContract.TABLE_NAME + " ON "+ContactContract.COLUMN_ID+
+                " = "+ContactMessageContract.COLUMN_CONTACT_ID + " UNION "+
+                "SELECT "+SmsContract.TABLE_NAME+".* ,"+GroupContract.COLUMN_NAME +
+                " FROM "+ContactMessageContract.TABLE_NAME+" INNER JOIN "+SmsContract.TABLE_NAME+
+                " ON " + SmsContract.COLUMN_ID + " = "+ContactMessageContract.COLUMN_Message_ID+
+                " AND "+SmsContract.COLUMN_STATUS + " = "+messageStatus+" AND "+ ContactMessageContract.COLUMN_CONTACT_ID +
+                " IS NULL"+" INNER JOIN "+GroupContract.TABLE_NAME + " ON "+GroupContract.COLUMN_ID+
+                " = "+SmsContract.COLUMN_GROUP_ID;
+        Cursor result = db.rawQuery(queryStatement,null);
+        ArrayList<RealMessage> messages = new ArrayList<>();
+        while (result.moveToNext()){
+            messages.add(new RealMessage(String.valueOf(result.getInt(result.getColumnIndex(SmsContract.COLUMN_GROUP_ID))),
+                    result.getString(result.getColumnIndex(SmsContract.COLUMN_SMS_TEXT)),
+                    result.getString(result.getColumnIndex(SmsContract.COLUMN_DATE)),
+                    result.getString(result.getColumnIndex(SmsContract.COLUMN_TIME)),
+                    String.valueOf(result.getInt(result.getColumnIndex(SmsContract.COLUMN_STATUS))),
+                    result.getString(result.getColumnIndex(ContactContract.COLUMN_NAME))));
+        }
+        return messages;
+
+    }
+    public int getContactIdByMessageID(int messageID){
+        SQLiteDatabase db = mDpHelper.getReadableDatabase();
+        String[] projection = {ContactMessageContract.COLUMN_CONTACT_ID};
+        String selection = ContactMessageContract.COLUMN_Message_ID+"=?";
+        String[] args = {String.valueOf(messageID)};
+        Cursor result = db.query(ContactMessageContract.TABLE_NAME,projection,selection,args,null,null,null);
+        return result.getInt(result.getColumnIndex(ContactMessageContract.COLUMN_CONTACT_ID));
     }
 
     public int deleteMessage(int messageID) {
@@ -197,6 +223,15 @@ public class SqlCommunication {
         String[] selectionArgs = {String.valueOf(messageID)};
         int id = db.update(SmsContract.TABLE_NAME, contentValues, selection, selectionArgs);
         return id;
+    }
+
+    public int getContactIdByNumber(String number){
+        SQLiteDatabase db = mDpHelper.getReadableDatabase();
+        String[] projection = {ContactContract.COLUMN_ID};
+        String selection = ContactContract.COLUMN_NUMBER + "=?";
+        String[] args = {number};
+        Cursor result = db.query(ContactContract.TABLE_NAME,projection,selection,args,null,null,null);
+        return result.getInt(result.getColumnIndex(ContactContract.COLUMN_ID));
     }
 
 

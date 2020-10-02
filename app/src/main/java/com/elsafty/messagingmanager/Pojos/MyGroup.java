@@ -5,14 +5,14 @@ public class MyGroup {
 
     private int color = -1;
     private Integer members;
-    private String photo ;
+    private Integer photo = null ;
 
     public MyGroup(String name, Integer members) {
         this.name = name;
         this.members = members;
     }
 
-    public String getPhoto() {
+    public Integer getPhoto() {
         return photo;
     }
 

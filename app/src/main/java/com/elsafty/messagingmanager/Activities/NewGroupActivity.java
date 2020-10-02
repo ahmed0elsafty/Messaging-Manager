@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class NewGroupActivity extends AppCompatActivity {
+public class NewGroupActivity extends AppCompatActivity implements MembersAdapter.MyOnClickListener {
     public static final String NEWGROUPACTIVITY_ACTION = "newGroup-acivity";
     private TextView txtMemberCount;
     private RecyclerView recyclerView;
@@ -47,7 +47,7 @@ public class NewGroupActivity extends AppCompatActivity {
             txtMemberCount.setText(getResources().getQuantityString(R.plurals.numberOfMembers,contacts.size(),contacts.size()));
         }
 
-        mAdapter = new MembersAdapter(this,contacts);
+        mAdapter = new MembersAdapter(this,contacts,this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this,RecyclerView.VERTICAL,false));
         btnContacts.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,4 +83,8 @@ public class NewGroupActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onClick(String name, String number,int id) {
+
+    }
 }
