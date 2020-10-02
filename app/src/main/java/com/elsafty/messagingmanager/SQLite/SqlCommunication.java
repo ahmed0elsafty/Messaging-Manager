@@ -76,14 +76,6 @@ public class SqlCommunication {
 
     public int getContactId(MyContact contact) {
         SQLiteDatabase db = mDpHelper.getReadableDatabase();
-
-        /*String selections = ContactContract.COLUMN_NAME + " == '" + contact.getName() +
-                "' AND " + ContactContract.COLUMN_NUMBER + " == '" + contact.getNumber() +"'";
-
-        String queryStatement = "SELECT " + ContactContract.COLUMN_ID + " FROM " + ContactContract.TABLE_NAME +
-                " WHERE " + selections;
-
-        Cursor result = db.rawQuery(queryStatement, null);*/
         String[] projection = {ContactContract.COLUMN_ID};
         String selections = ContactContract.COLUMN_NAME + "=? AND " +
                 ContactContract.COLUMN_NUMBER + "=?";

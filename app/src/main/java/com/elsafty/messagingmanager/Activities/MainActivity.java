@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -36,13 +34,16 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener , GroupAdapter.OnClickListener {
     public static final String MAINACTIVITY_ACTION = "main-activity";
     public static final String SENDMESSAGE_TO_GROUP_ACTION = "send_group";
+    public static final String SENDNEWMESSAGE_TO_GROUP_ACTION = "send_new_message";
+    public static final String SENDBROADCAST_TO_GROUP_ACTION = "send_broadcast";
+    public static final String SENDSCHEDULEMESSAGE_TO_GROUP_ACTION = "send_schedule_message";
     private static final int REQUEST_READ_CONTACTS = 1;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
     private NavigationView mNavigationView;
     private SqlCommunication sqlCommunication;
     private RecyclerView recyclerView;
-    private FloatingActionButton newMessageFab,newScheduleFab;
+    private FloatingActionButton newMessageFab,newScheduleFab,broadCastFab;
     private GroupAdapter mAdapter;
     private List<MyGroup> items;
     private boolean isFABOpen;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sqlCommunication = new SqlCommunication(this);
         newScheduleFab = findViewById(R.id.newschedule_fab);
         newMessageFab = findViewById(R.id.newMsseage_fab);
+        broadCastFab = findViewById(R.id.broadCast_fab);
         recyclerView = findViewById(R.id.group_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         items = sqlCommunication.getAllGroups();
@@ -89,13 +91,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "schedule", Toast.LENGTH_SHORT).show();
-                selectContact();
+                Intent intent = new Intent(MainActivity.this,SelelctForMessageActivity.class);
+                intent.setAction(SENDSCHEDULEMESSAGE_TO_GROUP_ACTION);
+                startActivity(intent);
             }
         });
         newMessageFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                selectContact();
+                Intent intent = new Intent(MainActivity.this,SelelctForMessageActivity.class);
+                intent.setAction(SENDNEWMESSAGE_TO_GROUP_ACTION);
+                startActivity(intent);
+            }
+        });
+        broadCastFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,SelectContactActivity.class);
+                intent.setAction(SENDBROADCAST_TO_GROUP_ACTION);
+                startActivity(intent);
             }
         });
         mToggle = new ActionBarDrawerToggle(this,
@@ -114,41 +128,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
-    }
 
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId()==R.id.newMessage){
-
-            ArrayList<MyContact> contactInGroup = sqlCommunication.getAllContactsInTheSameGroup(groupId);
-            Intent intent = new Intent(MainActivity.this, NewMessageActivity.class);
-            intent.setAction(SENDMESSAGE_TO_GROUP_ACTION);
-            intent.putParcelableArrayListExtra("group_member",contactInGroup);
-            intent.putExtra("group-id",groupId);
-            startActivity(intent);
-        }else {
-            ArrayList<MyContact> contactInGroup = sqlCommunication.getAllContactsInTheSameGroup(groupId);
-            Intent intent = new Intent(MainActivity.this, ScheduleMessageActivity.class);
-            intent.setAction(SENDMESSAGE_TO_GROUP_ACTION);
-            intent.putParcelableArrayListExtra("group_member",contactInGroup);
-            intent.putExtra("group-id",groupId);
-            startActivity(intent);
-        }
-
-        return super.onContextItemSelected(item);
-
-    }
 
     private void showFABMenu(){
         isFABOpen=true;
         newMessageFab.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
         newScheduleFab.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+        broadCastFab.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
 
     }
 
@@ -156,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         isFABOpen=false;
         newMessageFab.animate().translationY(0);
         newScheduleFab.animate().translationY(0);
+        broadCastFab.animate().translationY(0);
     }
 
 
@@ -190,9 +178,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             case R.id.action_settings:
                 Toast.makeText(this, "this is settings item", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.action_help:
-                Toast.makeText(this, "this is help item", Toast.LENGTH_SHORT).show();
                 return true;
         }
         return false;
@@ -236,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void selectContact() {
-        Intent intent = new Intent(this, SelelctForMessageActivity.class);
+        Intent intent = new Intent(this, ScheduleMessageActivity.class);
         intent.setAction(MAINACTIVITY_ACTION);
         startActivity(intent);
     }
@@ -254,6 +239,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onItemClick(View view, MyGroup obj, int pos) {
         groupId = pos+1;
+        ArrayList<MyContact> contactInGroup = sqlCommunication.getAllContactsInTheSameGroup(groupId);
+        Intent intent = new Intent(MainActivity.this, ScheduleMessageActivity.class);
+        intent.setAction(SENDMESSAGE_TO_GROUP_ACTION);
+        intent.putParcelableArrayListExtra("group_member",contactInGroup);
+        intent.putExtra("group-id",groupId);
+        startActivity(intent);
     }
 
 

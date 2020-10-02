@@ -48,6 +48,14 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_schedule" />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/broadCast_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:fabSize="mini"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_group" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

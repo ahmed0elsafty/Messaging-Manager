@@ -39,6 +39,7 @@ public class SelectContactActivity extends AppCompatActivity {
     private ArrayList<MyContact> contacts;
     private boolean fromNewGroup = false;
     private boolean fromMainActivity = false;
+    private boolean fromBroadCastAction = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,8 @@ public class SelectContactActivity extends AppCompatActivity {
             fromNewGroup = true;
         }else if(intent.getAction().equals(MainActivity.MAINACTIVITY_ACTION)){
             fromMainActivity =true;
+        }else if (intent.getAction().equals(MainActivity.SENDBROADCAST_TO_GROUP_ACTION)){
+            fromBroadCastAction=true;
         }
         initComponent();
         Toast.makeText(this, "Long press for multi selection", Toast.LENGTH_SHORT).show();
@@ -73,6 +76,12 @@ public class SelectContactActivity extends AppCompatActivity {
                 contacts= getselectedContacts();
                 if (fromNewGroup) {
                     Intent intent1 = new Intent(SelectContactActivity.this, NewGroupActivity.class);
+                    intent1.putParcelableArrayListExtra("selected-contacts", contacts);
+                    intent1.setAction(SELECT_CONTACT_ACTION);
+                    startActivity(intent1);
+                    finish();
+                }else if (fromBroadCastAction){
+                    Intent intent1 = new Intent(SelectContactActivity.this, ScheduleMessageActivity.class);
                     intent1.putParcelableArrayListExtra("selected-contacts", contacts);
                     intent1.setAction(SELECT_CONTACT_ACTION);
                     startActivity(intent1);

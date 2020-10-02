@@ -1,8 +1,6 @@
 package com.elsafty.messagingmanager.Activities;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.elsafty.messagingmanager.Adapters.SmsAdapter;
 import com.elsafty.messagingmanager.Pojos.RealMessage;
@@ -29,24 +27,10 @@ public class ScheduleActivity extends AppCompatActivity {
         sqlCommunication = new SqlCommunication(this);
         recyclerView = findViewById(R.id.schedule_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        new loadMessage().execute();
+        ArrayList<RealMessage> realMessages = sqlCommunication.getMessagesList(SmsContract.STATUS_SCHEDULED);
+        mAdapter = new SmsAdapter(ScheduleActivity.this, realMessages);
         recyclerView.setAdapter(mAdapter);
-    }
 
-    class loadMessage extends AsyncTask<Void, Void, ArrayList<RealMessage>> {
-
-        @Override
-        protected ArrayList<RealMessage> doInBackground(Void... voids) {
-            return sqlCommunication.getMessagesList(SmsContract.STATUS_SCHEDULED);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<RealMessage> realMessages) {
-            super.onPostExecute(realMessages);
-            Toast.makeText(ScheduleActivity.this, realMessages.size()+"", Toast.LENGTH_SHORT).show();
-            mAdapter = new SmsAdapter(ScheduleActivity.this, realMessages);
-
-        }
     }
 
 }

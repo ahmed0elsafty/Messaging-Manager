@@ -22,6 +22,7 @@ import com.elsafty.messagingmanager.R;
 import com.elsafty.messagingmanager.SQLite.SmsContract;
 import com.elsafty.messagingmanager.SQLite.SqlCommunication;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -139,11 +140,18 @@ public class NewMessageActivity extends AppCompatActivity {
         number = "";
     }
     private void createMessage(String contactName, String phoneNumber, String messageText) {
+        Date date = new Date();
         String name = contactName;
         String number = phoneNumber;
         String message = messageText;
         String messageDate = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            messageDate = java.time.LocalDate.now().toString();
+        }
         String messageTime = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            messageTime = java.time.LocalTime.now().toString();
+        }
         String messageStatus =String.valueOf(SmsContract.STATUS_SENT);
 
         // Start multi-thread to insert sms to database and start alarm manager

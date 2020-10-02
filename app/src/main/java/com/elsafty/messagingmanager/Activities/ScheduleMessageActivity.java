@@ -59,6 +59,7 @@ public class ScheduleMessageActivity extends AppCompatActivity {
     private String number;
     private MyDate mDate;
     private MyTime mTime;
+    private int broadcastId ;
     private int SmsID;
     ArrayList<MyContact> results;
     private int groupId;
@@ -108,6 +109,12 @@ public class ScheduleMessageActivity extends AppCompatActivity {
             Bundle bundle = intent.getBundleExtra("bundle");
             name  = bundle.getString("name");
             number = bundle.getString("number");
+        }else if (intent != null && intent.getAction().equals(MainActivity.SENDBROADCAST_TO_GROUP_ACTION)) {
+            results = intent.getParcelableArrayListExtra("selected-contacts");
+
+            broadcastId = groupId+50;
+            mSqlCommunication.insertContactsIntoGroup(results,broadcastId);
+            groupId = broadcastId;
         }
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override

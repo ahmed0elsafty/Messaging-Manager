@@ -21,10 +21,19 @@ public class SelelctForMessageActivity extends AppCompatActivity implements Memb
     private MembersAdapter mAdapter;
     private ArrayList<MyContact> contacts;
     private SqlCommunication sqlCommunication;
+    private boolean ScheduledAction = false;
+    private boolean NewAction = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selelct_for_message);
+        Intent intent = getIntent();
+        if (intent.getAction().equals(MainActivity.SENDNEWMESSAGE_TO_GROUP_ACTION)){
+            NewAction=true;
+        }else {
+            ScheduledAction=true;
+        }
         recyclerView = findViewById(R.id.select_recycler_view);
         sqlCommunication = new SqlCommunication(this);
         contacts = sqlCommunication.getAllContacts();
@@ -41,9 +50,17 @@ public class SelelctForMessageActivity extends AppCompatActivity implements Memb
         bundle.putString("number",number);
         bundle.putInt("id",id);
         Toast.makeText(this, String.valueOf(id), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, NewMessageActivity.class);
-        intent.putExtra("bundle",bundle);
-        intent.setAction(SELECT_FOR_MESSAGE_ACTIVITY);
-        startActivity(intent);
+        if (NewAction){
+            Intent intent = new Intent(this, NewMessageActivity.class);
+            intent.putExtra("bundle",bundle);
+            intent.setAction(SELECT_FOR_MESSAGE_ACTIVITY);
+            startActivity(intent);
+        }else if (ScheduledAction){
+            Intent intent = new Intent(this, ScheduleMessageActivity.class);
+            intent.putExtra("bundle",bundle);
+            intent.setAction(SELECT_FOR_MESSAGE_ACTIVITY);
+            startActivity(intent);
+        }
+
     }
 }
