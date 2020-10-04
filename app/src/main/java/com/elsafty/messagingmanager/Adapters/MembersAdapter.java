@@ -44,22 +44,11 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHold
         holder.name.setText(contact.getName());
         holder.number.setText(contact.getNumber());
         holder.image_letter.setText(contact.getName().substring(0, 1));
-
-        displayImage(holder, contact);
-
+        holder.image.setImageResource(R.drawable.shape_circle);
+        holder.image.setColorFilter(contact.getColor());
+        holder.image_letter.setVisibility(View.VISIBLE);
     }
 
-    private void displayImage(ViewHolder holder, MyContact contact) {
-        if (contact.getImage() != null) {
-            holder.image.setImageResource(contact.getImage());
-            holder.image.setColorFilter(null);
-            holder.image_letter.setVisibility(View.GONE);
-        } else {
-            holder.image.setImageResource(R.drawable.shape_circle);
-            holder.image.setColorFilter(contact.getColor());
-            holder.image_letter.setVisibility(View.VISIBLE);
-        }
-    }
 
     public MyContact getItem(int position) {
         return items.get(position);
@@ -75,7 +64,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHold
 
         public TextView name, number, image_letter;
         public CircularImageView image;
-        public RelativeLayout lyt_checked, lyt_image;
+        public RelativeLayout lyt_image;
         public View lyt_parent;
 
         public ViewHolder(View view) {

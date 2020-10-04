@@ -1,19 +1,17 @@
 package com.elsafty.messagingmanager.Pojos;
 
+import com.elsafty.messagingmanager.R;
+
 public class MyGroup {
     private String name;
 
-    private int color = -1;
+    private int color = R.color.red_500;
     private Integer members;
-    private Integer photo = null ;
+
 
     public MyGroup(String name, Integer members) {
         this.name = name;
         this.members = members;
-    }
-
-    public Integer getPhoto() {
-        return photo;
     }
 
     public Integer getMembers() {

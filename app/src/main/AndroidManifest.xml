@@ -21,6 +21,7 @@
         <activity
             android:name=".Activities.NewGroupActivity"
             android:label="@string/newGroupActivity_label"
+            android:launchMode="singleTop"
             android:parentActivityName=".Activities.MainActivity" />
         <activity
             android:name=".Activities.ScheduleMessageActivity"

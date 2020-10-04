@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.elsafty.messagingmanager.Adapters.GroupAdapter;
+import com.elsafty.messagingmanager.Adapters.SwipeToDeleteCallback;
 import com.elsafty.messagingmanager.Pojos.MyContact;
 import com.elsafty.messagingmanager.Pojos.MyGroup;
 import com.elsafty.messagingmanager.R;
@@ -26,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<MyGroup> items;
     private boolean isFABOpen;
     private int groupId;
+    private ItemTouchHelper touchHelper;
 
 
     @Override
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         toolbar.setTitle("Groups");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mNavigationView = findViewById(R.id.nav_view);
         sqlCommunication = new SqlCommunication(this);
@@ -65,24 +69,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         broadCastFab = findViewById(R.id.broadCast_fab);
         recyclerView = findViewById(R.id.group_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         items = sqlCommunication.getAllGroups();
         mAdapter = new GroupAdapter(this, items,this);
+        touchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(mAdapter));
         recyclerView.setAdapter(mAdapter);
-
+        touchHelper.attachToRecyclerView(recyclerView);
         FloatingActionButton fab = findViewById(R.id.select_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    int ReadContactsPermission = checkSelfPermission(READ_CONTACTS);
-                    if (ReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
-                        requestContactPermission();
-                    } else {
-                        if(!isFABOpen){
-                            showFABMenu();
-                        }else{
-                            closeFABMenu();
-                        }
+        fab.setOnClickListener(view -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int ReadContactsPermission = checkSelfPermission(READ_CONTACTS);
+                if (ReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                    requestContactPermission();
+                } else {
+                    if(!isFABOpen){
+                        showFABMenu();
+                    }else{
+                        closeFABMenu();
                     }
                 }
             }
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mNavigationView != null) {
             mNavigationView.setNavigationItemSelectedListener(this);
         }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
 
     }
@@ -256,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         List<Integer> selectedItemPositions = mAdapter.getSelectedItems();
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
             mAdapter.removeData(selectedItemPositions.get(i));
-            sqlCommunication.deleteGroup(selectedItemPositions.get(i));
         }
         mAdapter.notifyDataSetChanged();
     }*/
