@@ -19,7 +19,6 @@ import com.elsafty.messagingmanager.Utilities.Tools;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -28,61 +27,66 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SelectContactActivity extends AppCompatActivity {
-    public static final String SELECT_CONTACT_ACTION = "selectContact-activit";
+    public static final String SELECT_CONTACT_ACTION = "selectContact-activity";
     private RecyclerView recyclerView;
     private ContactAdapter mAdapter;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
     private Toolbar toolbar;
-    private ArrayList<MyContact> items = new ArrayList<>();
-    private FloatingActionButton fab_Load;
     private ArrayList<MyContact> contacts;
     private boolean fromNewGroup = false;
-    private boolean fromMainActivity = false;
     private boolean fromBroadCastAction = false;
+    private boolean fromNewMessaageAction = false;
+    private boolean fromScheduleMessageAction = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_contact);
         initToolbar();
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
-        Intent intent = getIntent();
-        if (intent.getAction().equals(NewGroupActivity.NEWGROUPACTIVITY_ACTION)){
-            fromNewGroup = true;
-        }else if(intent.getAction().equals(MainActivity.MAINACTIVITY_ACTION)){
-            fromMainActivity =true;
-        }else if (intent.getAction().equals(MainActivity.SENDBROADCAST_TO_GROUP_ACTION)){
-            fromBroadCastAction=true;
-        }
         initComponent();
-        Toast.makeText(this, "Long press for multi selection", Toast.LENGTH_SHORT).show();
-        SharedPreferences sharedPreferences = getPreferences(0);
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        if (action != null) {
+            switch (action) {
+                case NewGroupActivity.NEWGROUPACTIVITY_ACTION:
+                    fromNewGroup = true;
+                    break;
+                case MainActivity.SEND_BROADCAST_ACTION:
+                    fromBroadCastAction = true;
+                    break;
+                case MainActivity.SEND_NEWMESSAGE_ACTION:
+                    fromNewMessaageAction = true;
+                    break;
+                case MainActivity.SEND_SCHEDULE_MESSAGE_ACTION:
+                    fromScheduleMessageAction = true;
+                    break;
+
+            }
+        }
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("contactsPref", 0);
         boolean isFirst = sharedPreferences.getBoolean("first-time", false);
         if (isFirst == false) {
             new InsertAllContacts().execute(getContacts());
             writeInSharedPref(true);
         }
-        contacts = new ArrayList<>();
+
         FloatingActionButton fab = findViewById(R.id.select_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                contacts= getselectedContacts();
+                contacts = getselectedContacts();
                 if (fromNewGroup) {
                     Intent intent1 = new Intent(SelectContactActivity.this, NewGroupActivity.class);
                     intent1.putParcelableArrayListExtra("selected-contacts", contacts);
                     intent1.setAction(SELECT_CONTACT_ACTION);
                     startActivity(intent1);
                     finish();
-                }else if (fromBroadCastAction){
+                } else if (fromBroadCastAction) {
                     Intent intent1 = new Intent(SelectContactActivity.this, ScheduleMessageActivity.class);
-                    intent1.putParcelableArrayListExtra("selected-contacts", contacts);
+                    intent1.putParcelableArrayListExtra("selected-contact", contacts);
                     intent1.setAction(SELECT_CONTACT_ACTION);
                     startActivity(intent1);
                     finish();
@@ -90,7 +94,13 @@ public class SelectContactActivity extends AppCompatActivity {
             }
         });
 
+        if (!(fromNewMessaageAction || fromScheduleMessageAction)) {
+            Toast.makeText(this, "Long press for multi selection", Toast.LENGTH_SHORT).show();
+        }else {
+            fab.setVisibility(View.GONE);
+        }
     }
+
     private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.select_contact_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -98,31 +108,31 @@ public class SelectContactActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Select Contact");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Tools.setSystemBarColor(this, R.color.colorPrimary);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
-    private ArrayList<MyContact> getselectedContacts(){
+    private ArrayList<MyContact> getselectedContacts() {
         ArrayList<MyContact> contacts = new ArrayList<>();
-        for (int id :mAdapter.getSelectedItems()){
+        for (int id : mAdapter.getSelectedItems()) {
             contacts.add(mAdapter.getItem(id));
         }
         return contacts;
     }
-    private void addItems(){
-
-        items.clear();
-        items.addAll(getContacts());
-
-        mAdapter.notifyDataSetChanged();
-    }
 
     private void initComponent() {
-        fab_Load = findViewById(R.id.select_fab);
-        recyclerView =  findViewById(R.id.contact_recyclerView);
+        recyclerView = findViewById(R.id.contact_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
         //set data and list adapter
-        mAdapter = new ContactAdapter(this, items);
+        contacts = new ArrayList<>();
+        contacts.addAll(getContacts());
+        mAdapter = new ContactAdapter(this, contacts);
         recyclerView.setAdapter(mAdapter);
         mAdapter.setOnClickListener(new ContactAdapter.OnClickListener() {
             @Override
@@ -130,26 +140,33 @@ public class SelectContactActivity extends AppCompatActivity {
                 if (mAdapter.getSelectedItemCount() > 0) {
                     enableActionMode(pos);
                 } else {
-                    // read the contact which removes bold from the row
                     MyContact contact = mAdapter.getItem(pos);
-                    Toast.makeText(getApplicationContext(), "Read: " + contact.getName(), Toast.LENGTH_SHORT).show();
+                    Intent intent ;
+                    if (fromNewMessaageAction){
+                         intent= new Intent(SelectContactActivity.this,NewMessageActivity.class);
+                         intent.setAction(MainActivity.SEND_NEWMESSAGE_ACTION);
+                         intent.putExtra("selected-contact",pos+1);
+                         startActivity(intent);
+                    }else if (fromScheduleMessageAction){
+                        intent= new Intent(SelectContactActivity.this,ScheduleMessageActivity.class);
+                        intent.setAction(MainActivity.SEND_SCHEDULE_MESSAGE_ACTION);
+                        intent.putExtra("selected-contact",pos+1);
+                        startActivity(intent);
+                    }
+
                 }
             }
 
             @Override
             public void onItemLongClick(View view, MyContact obj, int pos) {
-                enableActionMode(pos);
+                if (fromNewMessaageAction || fromScheduleMessageAction) {
+                    view.cancelLongPress();
+                } else {
+                    enableActionMode(pos);
+                }
             }
         });
 
-        fab_Load.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addItems();
-            }
-        });
-
-        addItems();
         actionModeCallback = new ActionModeCallback();
 
     }
@@ -173,14 +190,6 @@ public class SelectContactActivity extends AppCompatActivity {
         }
     }
 
-    private void deleteContacts() {
-        List<Integer> selectedItemPositions = mAdapter.getSelectedItems();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-            mAdapter.removeData(selectedItemPositions.get(i));
-        }
-        mAdapter.notifyDataSetChanged();
-    }
-
     private ArrayList<MyContact> getContacts() {
         // Retrieve Contacts from phone
         String[] projections = {ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER};
@@ -201,7 +210,7 @@ public class SelectContactActivity extends AppCompatActivity {
     }
 
     private void writeInSharedPref(boolean isFirstTime) {
-        SharedPreferences preferences = getPreferences(0);
+        SharedPreferences preferences = getSharedPreferences("contactsPref", 0);
         SharedPreferences.Editor edit = preferences.edit();
         edit.putBoolean("first-time", isFirstTime);
         edit.commit();
@@ -211,7 +220,6 @@ public class SelectContactActivity extends AppCompatActivity {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             Tools.setSystemBarColor(SelectContactActivity.this, R.color.colorDarkBlue2);
-           // mode.getMenuInflater().inflate(R.menu.menu_delete, menu);
             return true;
         }
 

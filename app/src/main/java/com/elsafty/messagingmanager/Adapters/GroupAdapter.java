@@ -23,7 +23,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     private Context mContext;
     private List<MyGroup> items;
     private OnClickListener listener;
-    //private int current_selected_idx = -1;
     private MyGroup mRecentlyDeletedGroup;
     private int mRecentlyDeletedGroupPosition;
     private MainActivity mActivity;
@@ -36,6 +35,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         mActivity = (MainActivity) mContext;
         sqlCommunication = new SqlCommunication(mContext);
     }
+
 
 
     @Override
@@ -65,17 +65,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         return items.get(position);
     }
 
-   /* public void removeData(int position) {
-        items.remove(position);
-        sqlCommunication.deleteGroup(position+1);
-        Toast.makeText(mContext, ""+position, Toast.LENGTH_SHORT).show();
-        resetCurrentIndex();
-    }
-
-    private void resetCurrentIndex() {
-        current_selected_idx = -1;
-    }*/
-
     public Context getContext() {
         return mContext;
     }
@@ -84,20 +73,28 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         mRecentlyDeletedGroup = items.get(position);
         mRecentlyDeletedGroupPosition = position;
         items.remove(position);
+        sqlCommunication.deleteGroup(sqlCommunication.getGrouptId(mRecentlyDeletedGroup));
         notifyItemRemoved(position);
-        showUndoSnackbar();
+        showUndoSnackbar(position);
     }
-    private void showUndoSnackbar() {
+    private void showUndoSnackbar(int position) {
         View view = mActivity.findViewById(R.id.content);
         Snackbar snackbar = Snackbar.make(view, "DELETE GROUP",
                 Snackbar.LENGTH_LONG);
-        snackbar.setAction("UNDO DELETE", v -> undoDelete());
+        snackbar.setAction("UNDO DELETE", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                undoDelete();
+            }
+        });
         snackbar.show();
     }
 
     private void undoDelete() {
+
         items.add(mRecentlyDeletedGroupPosition,
                 mRecentlyDeletedGroup);
+        sqlCommunication.insertGroup(mRecentlyDeletedGroup);
         notifyItemInserted(mRecentlyDeletedGroupPosition);
     }
 

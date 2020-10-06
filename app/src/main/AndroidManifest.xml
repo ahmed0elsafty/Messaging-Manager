@@ -11,10 +11,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Activities.NewMessageActivity"></activity>
         <activity
-            android:name=".Activities.SelelctForMessageActivity"
-            android:label="Select Contact"
-            android:parentActivityName=".Activities.MainActivity" />
-        <activity
             android:name=".Activities.SelectContactActivity"
             android:label="@string/title_activity_select_contact"
             android:theme="@style/AppTheme.NoActionBar" />

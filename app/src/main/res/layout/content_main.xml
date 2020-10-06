@@ -31,38 +31,77 @@
             android:layout_height="match_parent"/>
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <LinearLayout
         android:id="@+id/newMsseage_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:fabSize="mini"
-        android:src="@drawable/sms" />
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/nm_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="New Message" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/ic_sms" />
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/newschedule_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:fabSize="mini"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_schedule" />
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/ns_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Schedule Message" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            app:fabSize="mini"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/ic_schedule" />
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/broadCast_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:fabSize="mini"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_group" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/bm_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Broadcast Message" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            app:fabSize="mini"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/ic_group" />
+    </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/select_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add" />
-
-
+        android:src="@drawable/ic_add_message" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

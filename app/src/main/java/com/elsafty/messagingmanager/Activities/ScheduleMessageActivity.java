@@ -55,14 +55,13 @@ public class ScheduleMessageActivity extends AppCompatActivity {
     private Button btnDate;
     private Button btnTime;
     private ImageButton btnSend;
-    private String name;
-    private String number;
     private MyDate mDate;
     private MyTime mTime;
-    private int broadcastId ;
     private int SmsID;
-    ArrayList<MyContact> results;
+    private ArrayList<MyContact> results;
     private int groupId;
+    private int contactId;
+    private boolean fromScheduleMessageAction = false;
     private SqlCommunication mSqlCommunication;
 
     private static boolean AirplaneModeOn(Context context) {
@@ -99,22 +98,28 @@ public class ScheduleMessageActivity extends AppCompatActivity {
         });
 
         Intent intent = getIntent();
+        String action = intent.getAction();
+        if (action != null) {
+            switch (action) {
+                case MainActivity.SEND_MESSAGE_TO_GROUP_ACTION:
+                    results = intent.getParcelableArrayListExtra("group_member");
+                    groupId = intent.getIntExtra("group-id", -1);
+                    break;
+                case MainActivity.SEND_SCHEDULE_MESSAGE_ACTION:
+                    contactId = intent.getIntExtra("selected-contact",-1);
+                    fromScheduleMessageAction =true;
+                    break;
+                case MainActivity.SEND_BROADCAST_ACTION:
+                    results = intent.getParcelableArrayListExtra("selected-contacts");
 
-        if (intent != null && intent.getAction().equals(MainActivity.SENDMESSAGE_TO_GROUP_ACTION)) {
-            results = intent.getParcelableArrayListExtra("group_member");
-            groupId = intent.getIntExtra("group-id",-1);
+                    /*broadcastId = groupId + 50;
+                    mSqlCommunication.insertContactsIntoGroup(results, broadcastId);
+                    groupId = broadcastId;*/
+                    break;
+                default:
 
-            Toast.makeText(this, String.valueOf(groupId), Toast.LENGTH_SHORT).show();
-        }else if(intent.getAction().equals(SelelctForMessageActivity.SELECT_FOR_MESSAGE_ACTIVITY)){
-            Bundle bundle = intent.getBundleExtra("bundle");
-            name  = bundle.getString("name");
-            number = bundle.getString("number");
-        }else if (intent != null && intent.getAction().equals(MainActivity.SENDBROADCAST_TO_GROUP_ACTION)) {
-            results = intent.getParcelableArrayListExtra("selected-contacts");
-
-            broadcastId = groupId+50;
-            mSqlCommunication.insertContactsIntoGroup(results,broadcastId);
-            groupId = broadcastId;
+                    break;
+            }
         }
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,7 +218,11 @@ public class ScheduleMessageActivity extends AppCompatActivity {
                         {
                             Toast.makeText(getApplicationContext(), "Time has changed, SMS must be scheduled for a future time", Toast.LENGTH_SHORT).show();
                         } else {
-                            createMessage(groupId, messageText);
+                            if (fromScheduleMessageAction){
+                                createMessage(0, messageText);
+                            }else {
+                                createMessage(groupId, messageText);
+                            }
                         }
                     } else if (selectedOption == 1) {
                         Toast.makeText(ScheduleMessageActivity.this, "SMS has not been scheduled", Toast.LENGTH_LONG).show();
@@ -229,7 +238,11 @@ public class ScheduleMessageActivity extends AppCompatActivity {
             builder.show();
         } else //Schedule SMS
         {
-            createMessage(groupId,  messageText);
+            if (fromScheduleMessageAction){
+                createMessage(0, messageText);
+            }else {
+                createMessage(groupId, messageText);
+            }
         }
     }
 
@@ -244,6 +257,7 @@ public class ScheduleMessageActivity extends AppCompatActivity {
         ScheduleSmsAsyncTask task = new ScheduleSmsAsyncTask();
         task.execute(gid, message, messageDate, messageTime, messageStatus);
     }
+
 
     private void resetInput() {
         editTxtMessage.setText("");
@@ -260,9 +274,11 @@ public class ScheduleMessageActivity extends AppCompatActivity {
         protected String doInBackground(String... string) {
             String result = "SMS Successfully Scheduled";
             try {
-
-                int SmsID = mSqlCommunication.insertMessage(new MyMessage(string[0],string[1],string[2],string[3],string[4]),0);
-
+                if (contactId==0) {
+                    SmsID = mSqlCommunication.insertMessage(new MyMessage(string[0], string[1], string[2], string[3], string[4]), 0);
+                }else {
+                    SmsID = mSqlCommunication.insertMessage(new MyMessage("0", string[1], string[2], string[3], string[4]), contactId);
+                }
                 Calendar c = Calendar.getInstance();
                 c.set(Calendar.YEAR, mDate.getYear());
                 c.set(Calendar.MONTH, mDate.getMonth());

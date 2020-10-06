@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
 
-    private Context ctx;
+        private Context ctx;
     private List<MyContact> items;
     private OnClickListener onClickListener = null;
 
